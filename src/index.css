@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #F4F7F6;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #EBF2F0;
+  --color-accent-teal: #2A7A78;
+  --color-accent-mint: #D5E8E4;
+  --color-accent-sage: #7C9D96;
+  --color-text-primary: #1A2E2B;
+  --color-text-secondary: #5C736F;
+  --color-border-subtle: #E2ECE9;
+  --font-sans: 'Geist Sans', 'Geist Sans Fallback', system-ui, -apple-system, sans-serif;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background-color: var(--color-canvas);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  user-select: none;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* GPU Accelerated Scroll View for Mobile PWA */
+.scroll-view {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+  transform: translateZ(0);
+}
+
+::selection {
+  background-color: rgba(42, 122, 120, 0.15);
+}
+
+/* Minimalist Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-accent-mint);
+  border-radius: 10px;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
