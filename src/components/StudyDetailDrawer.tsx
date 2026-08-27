@@ -12,12 +12,14 @@ import {
   Copy,
   Check,
   FilePdf,
-  ArrowSquareOut,
   MagnifyingGlassPlus,
   Trash,
+  Eye,
+  DownloadSimple,
 } from '@phosphor-icons/react';
 import type { ClinicalStudy, StudyType } from '../types/study';
 import { useState, useEffect } from 'react';
+import { PdfViewerModal } from './PdfViewerModal';
 
 export interface StudyDetailDrawerProps {
   study: ClinicalStudy | null;
@@ -56,6 +58,7 @@ export function StudyDetailDrawer({ study, isOpen, onClose, onDelete }: StudyDet
   const [mounted, setMounted] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isPdfViewerOpen, setIsPdfViewerOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -81,6 +84,12 @@ export function StudyDetailDrawer({ study, isOpen, onClose, onDelete }: StudyDet
   const isImage = Boolean(
     study.fileType?.startsWith('image/') ||
     study.fileName?.match(/\.(jpe?g|png|webp|heic)$/i)
+  );
+
+  const isPdf = Boolean(
+    study.fileType === 'application/pdf' ||
+    study.fileName?.toLowerCase().endsWith('.pdf') ||
+    (!isImage && (study.fileBlob || study.fileUrl))
   );
 
   const handleCopySummary = () => {
@@ -221,7 +230,7 @@ export function StudyDetailDrawer({ study, isOpen, onClose, onDelete }: StudyDet
                 <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 scroll-view">
                   
                   {/* Original Attached File Card with Direct Expand / Open Actions */}
-                  {previewUrl ? (
+                  {previewUrl || study.fileBlob ? (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-accent-teal">
@@ -235,7 +244,7 @@ export function StudyDetailDrawer({ study, isOpen, onClose, onDelete }: StudyDet
                       {isImage ? (
                         <div className="relative group rounded-2xl overflow-hidden border border-border-subtle bg-surface-subtle shadow-xs">
                           <img
-                            src={previewUrl}
+                            src={previewUrl || ''}
                             alt={study.title}
                             className="w-full h-44 object-cover cursor-pointer transition-transform duration-300 group-hover:scale-105"
                             onClick={() => setIsLightboxOpen(true)}
@@ -264,16 +273,25 @@ export function StudyDetailDrawer({ study, isOpen, onClose, onDelete }: StudyDet
                             </div>
                           </div>
 
-                          <a
-                            href={previewUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            download={study.fileName || 'documento_clinico.pdf'}
-                            className="px-3.5 py-2 bg-accent-teal text-white rounded-xl text-[12px] font-bold flex items-center gap-1.5 shadow-2xs active:scale-95 transition-transform cursor-pointer hover:bg-accent-teal/95"
-                          >
-                            <span>Abrir PDF</span>
-                            <ArrowSquareOut size={14} weight="bold" />
-                          </a>
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setIsPdfViewerOpen(true)}
+                              className="px-3.5 py-2 bg-accent-teal text-white rounded-xl text-[12px] font-bold flex items-center gap-1.5 shadow-2xs active:scale-95 transition-transform cursor-pointer hover:bg-accent-teal/95"
+                            >
+                              <Eye size={15} weight="bold" />
+                              <span>Ver PDF</span>
+                            </button>
+
+                            <a
+                              href={previewUrl || ''}
+                              download={study.fileName || 'documento_clinico.pdf'}
+                              className="w-8 h-8 rounded-xl bg-surface border border-border-subtle flex items-center justify-center text-text-secondary hover:text-accent-teal active:scale-90 transition-transform cursor-pointer"
+                              title="Descargar archivo"
+                            >
+                              <DownloadSimple size={15} weight="bold" />
+                            </a>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -312,6 +330,17 @@ export function StudyDetailDrawer({ study, isOpen, onClose, onDelete }: StudyDet
                     >
                       <Trash weight="bold" size={16} />
                       <span>Eliminar</span>
+                    </button>
+                  )}
+
+                  {isPdf && (
+                    <button
+                      type="button"
+                      onClick={() => setIsPdfViewerOpen(true)}
+                      className="flex-1 py-3 px-3 rounded-2xl bg-accent-teal/10 text-accent-teal border border-accent-teal/20 font-semibold text-[13px] flex items-center justify-center gap-2 active:scale-95 transition-transform cursor-pointer hover:bg-accent-teal/15"
+                    >
+                      <FilePdf weight="bold" size={16} />
+                      <span>Leer PDF</span>
                     </button>
                   )}
 
@@ -381,6 +410,16 @@ export function StudyDetailDrawer({ study, isOpen, onClose, onDelete }: StudyDet
           </div>
         )}
       </AnimatePresence>
+
+      {/* In-App PDF Reader Modal */}
+      <PdfViewerModal
+        isOpen={isPdfViewerOpen}
+        onClose={() => setIsPdfViewerOpen(false)}
+        fileBlob={study.fileBlob}
+        fileUrl={previewUrl}
+        fileName={study.fileName}
+        title={study.title}
+      />
     </>
   );
 
