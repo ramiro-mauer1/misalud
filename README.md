@@ -11,8 +11,6 @@ Prototipo de PWA para guardar tus estudios médicos (laboratorios, recetas, imá
 - **Perfil** del paciente editable.
 - **Todo queda en el dispositivo:** los datos se guardan en IndexedDB, sin servidor.
 
-Estado: prototipo. La clasificación de cada estudio hoy se infiere del nombre del archivo; el análisis del contenido es el próximo paso.
-
 ## Stack
 
 Vite 6 · React 19 · TypeScript · Tailwind 4 · IndexedDB (`idb`) · PDF.js · Framer Motion
